@@ -110,14 +110,27 @@ class SentenceDetails:
         self.parse.append(parseval)
         #check for NN and NNS
         if (syntval in ['NN','NNS']):
-            print("hi")
-            self.checkDeterminer(int(indval),syntval)
-    
+            #print("hi")
+            rArt = ErrorDef("ART")
+            retVal = rArt.checkDeterminer(int(indval),syntval)
+            if retVal != 0:
+                self.lstProb.append(retVal)
+            
     def getWords(self):
         return self.words
+                
+    def solveProblem(self):
+        objLstProblems = ProblemList(self.lstProb,self.words)
+
+class ErrorDef:
+    #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
+    ErrorType = ""
+            
+    def __init__(self,etype):
+        self.ErrorType = etype
     
+    #Determine the Article Determiner  error        
     def checkDeterminer(self,indval,syntval):
-        #print(self.words[indval])
         ind = indval
         #checking Sibling items for NP so that and also finding Determiner
         condition = True
@@ -139,17 +152,14 @@ class SentenceDetails:
             ind= ind-1
         if foundDet is False:
             print("problem found")
-            #print(lstParse[::-1])
-            #print(lstWords[::-1])
             probEnd = indval
-            self.lstProb.append([probStart,probEnd,syntval])
+            #self.lstProb.append([probStart,probEnd,syntval])
+            return [probStart,probEnd,syntval,etype]
         else:
             foundDet = False
+        return 0
+        
             
-    def solveProblem(self):
-        objLstProblems = ProblemList(self.lstProb,self.words)
-        
-        
 #function for generation of list of words
 sentLst = Sentences()
 
