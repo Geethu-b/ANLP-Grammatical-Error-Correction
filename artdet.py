@@ -4,23 +4,42 @@ class Problem:
     start               = 0
     end                 = 0
     typeProb            = "" 
+    errorType           = ""  #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
     lstWords            = None
     lstChecksentoptions = None
+    #solution is an array which has 3 para
+    #para 1 : start of the word list
+    #para 2 : Solution type INB / INA /   NA / REP are the solutions
+    #para 3 : for before insert the text to be inserted for NA and Replace option
+    # the text will be blank
+    solution            = None
     
-    def __init__(self,startval,endval,typep,lstWordval):
-        self.start    = int(startval)
-        self.end      = int(endval)
-        self.typeProb = typep
-        self.lstWords = lstWordval
+    def __init__(self,startval,endval,typep,errorTypeval,lstWordval):
+        self.start               = int(startval)
+        self.end                 = int(endval)
+        self.typeProb            = typep
+        self.errorType           = errorTypeval
+        self.lstWords            = lstWordval
         self.lstChecksentoptions = []
+        self.solution            = []
         self.genChecklist()
         self.getNgramcount()
 
     
     def genChecklist(self):        
+        
+        problemCondition = True
         size = self.end-self.start+1
-        mleft  = 5-size-1
-        mRight = 1
+        
+        if size<=2:
+            mleft  = 1
+            mRight = 1 
+        elif size<=3:
+            mleft  = 1
+            mRight = 0
+        else:
+            problemCondition = False
+            
         if mleft>self.start:
             allowLeft = int(self.start)
         else:
@@ -30,13 +49,24 @@ class Problem:
             allowRight = mRight
         else:
             allowRight = 0
-        print("in prob",self.typeProb)
-
+            
+        # Going in the details of the problem
+        if problemCondition == True:
+            self.genSentlist(allowLeft,allowRight)
+        else:
+            #Solution  is none at this case
+            
+            self.solution=[self.start,"NA",""]
+                
+            
+    def genSentlist(self,allowLeft,allowRight):
+        #print("in prob",self.typeProb, allowLeft,allowRight, size,self.end+allowRight)
         wordLst1   = self.lstWords[self.start-allowLeft:self.start]            
-        wordLst2   = self.lstWords[self.end:self.end+allowRight]
+        wordLst2   = self.lstWords[self.end+1:self.end+allowRight+1]
         wordLstmid = self.lstWords[self.start:self.end+1]
-        
-        self.lstChecksentoptions.append([" ".join(wordLst1+wordLstmid + wordLst2),'NA','NA'])
+        #print(wordLst1)
+        #print(wordLst2)
+        self.lstChecksentoptions.append([" ".join(wordLst1+wordLstmid + wordLst2),'NA',""])
         if self.typeProb == "NN":
             #print("in prob",self.typeProb)
             #a , an ,the replace candidate
@@ -48,32 +78,54 @@ class Problem:
             #the replace candidate
             self.lstChecksentoptions.append([" ".join(wordLst1+["the"]+wordLstmid + wordLst2),'IN','the'])
             
-        #print(self.lstChecksent)
+        print(self.lstChecksentoptions)
         
     def getNgramcount(self):
-        #print(self.lstChecksentoptions)
+        bestScore  = 0
+        bestOpt    = ""
+        bestOptval = ""
+        # get the best value to determine the solution
         for sent,opt,optval in self.lstChecksentoptions:
             #print(sent,opt,optval)
-            print(cg.qryGoogle(sent))
+            outVal = cg.qryGoogle(sent)
+            print(outVal)
+            if outVal>bestScore:
+                bestScore  = outVal
+                bestOpt    = opt
+                bestOptval = optval
+        #if no best score is found the solution is not applicable
         
+        if bestScore ==0:
+            self.solution = [self.start,"NA",""]
+        else:
+            self.solution = [self.start,bestOpt,bestOptval]
+        
+    def getSolution(self):
+        return self.solution
             
 class ProblemList:
     lstProbclassobj = None
-    lstProb = None
-    lstWords = None
+    lstSolutions    = None
+    lstProb         = None
+    lstWords        = None
     
     def __init__(self,lstProbval,lstWordval):
-        self.lstProb = lstProbval
-        self.lstProbclassobj=[]
-        self.lstWords = lstWordval
+        self.lstProb         = lstProbval
+        self.lstProbclassobj = []
+        self.lstSolutions    = []
+        self.lstWords        = lstWordval
         self.genProbObj()
         
     def genProbObj(self):
         #adding to problem list
         for start,end,typev,errorType in self.lstProb:
             print(start,end,typev,errorType)
-            self.lstProbclassobj.append(Problem(start,end,typev,self.lstWords))
- 
+            self.lstProbclassobj.append(Problem(start,end,typev,errorType,self.lstWords))
+    
+    def getSolutions(self):
+        for prob in self.lstProbclassobj:
+            self.lstSolutions.append(prob.getSolution())
+        return self.lstSolutions
 
 class Sentences:
     lstSent =None
@@ -94,6 +146,7 @@ class SentenceDetails:
     synt =None
     parse=None
     lstProb = None
+    lstSoln = None
     
     def __init__(self):
         self.inds    = []
@@ -101,6 +154,7 @@ class SentenceDetails:
         self.synt    = []
         self.parse   = []
         self.lstProb = []
+        self.lstSoln = []
     
     def addItems(self,indval,wordval,syntval,parseval):
         #print(indval,syntval)
@@ -118,9 +172,14 @@ class SentenceDetails:
             
     def getWords(self):
         return self.words
+    
+    def listProblems(self):
+        print(self.lstProb)
                 
     def solveProblem(self):
         objLstProblems = ProblemList(self.lstProb,self.words)
+        self.lstSoln = objLstProblems.getSolutions()
+        print(self.lstSoln)
 
 class ErrorDef:
     #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
@@ -145,7 +204,7 @@ class ErrorDef:
             condition = 'NP' not in sentDet.parse[ind]
             lstWords.append(sentDet.words[ind])
             lstParse.append(sentDet.parse[ind])
-            if (sentDet.synt[ind] is 'det'):
+            if (sentDet.synt[ind] == 'DT'):
                 foundDet = True
             probStart= ind
             #print(self.synt[ind],self.words[ind],self.parse[ind],condition)
@@ -171,7 +230,7 @@ lTest  = fileTest.split('\n\n')
 
 
 #for i in range(0,len(lTest)):
-for i in range(1,2):
+for i in range(8,9):
     
     lines = lTest[i].split('\n')
     sentDet = SentenceDetails()    
@@ -186,6 +245,7 @@ for i in range(1,2):
        
     #adding in the sentences                
     print(sentDet.getWords())
+    sentDet.listProblems()
     sentDet.solveProblem()
     sentLst.addSentence(sentDet.getWords())
     #print(synt)
