@@ -70,8 +70,8 @@ class ProblemList:
         
     def genProbObj(self):
         #adding to problem list
-        for start,end,typev in self.lstProb:
-            print(start,end,typev)
+        for start,end,typev,errorType in self.lstProb:
+            print(start,end,typev,errorType)
             self.lstProbclassobj.append(Problem(start,end,typev,self.lstWords))
  
 
@@ -112,7 +112,7 @@ class SentenceDetails:
         if (syntval in ['NN','NNS']):
             #print("hi")
             rArt = ErrorDef("ART")
-            retVal = rArt.checkDeterminer(int(indval),syntval)
+            retVal = rArt.checkDeterminer(int(indval),syntval,self)
             if retVal != 0:
                 self.lstProb.append(retVal)
             
@@ -130,7 +130,7 @@ class ErrorDef:
         self.ErrorType = etype
     
     #Determine the Article Determiner  error        
-    def checkDeterminer(self,indval,syntval):
+    def checkDeterminer(self,indval,syntval,sentDet):
         ind = indval
         #checking Sibling items for NP so that and also finding Determiner
         condition = True
@@ -142,10 +142,10 @@ class ErrorDef:
         probStart = 0
     
         while (condition):
-            condition = 'NP' not in self.parse[ind]
-            lstWords.append(self.words[ind])
-            lstParse.append(self.parse[ind])
-            if (self.synt[ind] is 'det'):
+            condition = 'NP' not in sentDet.parse[ind]
+            lstWords.append(sentDet.words[ind])
+            lstParse.append(sentDet.parse[ind])
+            if (sentDet.synt[ind] is 'det'):
                 foundDet = True
             probStart= ind
             #print(self.synt[ind],self.words[ind],self.parse[ind],condition)
@@ -154,7 +154,7 @@ class ErrorDef:
             print("problem found")
             probEnd = indval
             #self.lstProb.append([probStart,probEnd,syntval])
-            return [probStart,probEnd,syntval,etype]
+            return [probStart,probEnd,syntval,self.ErrorType]
         else:
             foundDet = False
         return 0
