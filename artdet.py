@@ -1,12 +1,74 @@
 import checkGoogle as cg
 
+class GoogleSentList:
+    
+    allowLstBefore = None
+    allowLstAfter  = None
+    allowLstMid    = None
+    reduceLstMid   = None
+    
+    wordLstBefore  = None
+    wordLstAfter   = None
+    wordLstmid     = None
+    lstWords       = None
+    
+    lstChecksentoptions = None
+    
+    start = 0
+    end   = 0
+    
+    def __init__(self,allowLstBefore, allowLstAfter, allowLstMid, redLstMid, lstWords, prbStart, prbEnd ):
+        self.allowLstBefore      = allowLstBefore
+        self.allowLstAfter       = allowLstAfter
+        self.allowLstMid         = allowLstMid
+        self.reduceLstMid        = redLstMid
+        
+        self.wordLstBefore       = []
+        self.wordLstAfter        = []
+        self.wordLstmid          = []
+        self.lstChecksentoptions = []
+        self.lstWords            = lstWords
+        self.start               = prbStart
+        self.end                 = prbEnd
+        
+    def genSentlist(self,allowLeft,allowRight,typeProb):
+        if self.reduceLstMid == True:
+            startMid = self.start+1
+            endMid   = self.end
+        else:
+            startMid = self.start
+            endMid   = self.end
+        
+        if self.allowLstBefore == True:
+            self.wordLstBefore   = self.lstWords[self.start-allowLeft:self.start]            
+        if self.allowLstAfter == True:
+            self.wordLstAfter   = self.lstWords[self.end+1:self.end+allowRight+1]
+        if self.allowLstMid == True:
+            self.wordLstmid = self.lstWords[startMid:endMid+1]
+        self.lstChecksentoptions.append([" ".join(self.wordLstBefore+self.wordLstmid + self.wordLstAfter),'NA',""])
+        if typeProb == "NN":
+            #a , an ,the replace candidate
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore+["a"]+self.wordLstmid + self.wordLstAfter),'INB','a'])
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore+["an"]+self.wordLstmid + self.wordLstAfter),'INB','an'])
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore+["the"]+self.wordLstmid + self.wordLstAfter),'INB','the'])
+            #print(self.lstChecksent)
+        else:
+            #the replace candidate
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore+["the"]+self.wordLstmid + self.wordLstAfter),'INB','the'])
+            
+        return (self.lstChecksentoptions)
+    
+
 class Problem:
     start               = 0
     end                 = 0
+    size                = 0
     typeProb            = "" 
     errorType           = ""  #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
     lstWords            = None
     lstChecksentoptions = None
+    allowLeft           = 0
+    allowRight          = 0
     #solution is an array which has 3 para
     #para 1 : start of the word list
     #para 2 : Solution type INB / INA /   NA / REP are the solutions
@@ -18,87 +80,128 @@ class Problem:
         self.start               = int(startval)
         self.end                 = int(endval)
         self.typeProb            = typep
+        self.problemCondition    = False
         self.errorType           = errorTypeval
         self.lstWords            = lstWordval
         self.lstChecksentoptions = []
         self.solution            = []
         self.genChecklist()
-        self.getNgramcount()
+        if self.problemCondition == True:
+            self.getNgramcount()
+            self.scoreCheck()
 
     
     def genChecklist(self):        
         
-        problemCondition = True
-        size = self.end-self.start+1
+        self.problemCondition = True
+        self.size = self.end-self.start+1
         
-        if size<=2:
+        mleft = 0
+        
+        if self.size<=2:
             mleft  = 1
             mRight = 1 
-        elif size<=3:
+        elif self.size<=3:
             mleft  = 1
             mRight = 0
         else:
-            problemCondition = False
+            self.problemCondition = False
             
         if mleft>self.start:
-            allowLeft = int(self.start)
+            self.allowLeft = int(self.start)
         else:
-            allowLeft = int(mleft)
+            self.allowLeft = int(mleft)
         
         if self.end<len(self.lstWords)-2:
-            allowRight = mRight
+            self.allowRight = mRight
         else:
-            allowRight = 0
+            self.allowRight = 0
             
         # Going in the details of the problem
-        if problemCondition == True:
-            self.genSentlist(allowLeft,allowRight)
+        if self.problemCondition == True:
+            genSentence              = GoogleSentList(True,True,True,False,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
         else:
-            #Solution  is none at this case
-            
+            #Solution  is none at this case            
             self.solution=[self.start,"NA",""]
                 
             
-    def genSentlist(self,allowLeft,allowRight):
-        #print("in prob",self.typeProb, allowLeft,allowRight, size,self.end+allowRight)
-        wordLst1   = self.lstWords[self.start-allowLeft:self.start]            
-        wordLst2   = self.lstWords[self.end+1:self.end+allowRight+1]
-        wordLstmid = self.lstWords[self.start:self.end+1]
-        #print(wordLst1)
-        #print(wordLst2)
-        self.lstChecksentoptions.append([" ".join(wordLst1+wordLstmid + wordLst2),'NA',""])
-        if self.typeProb == "NN":
-            #print("in prob",self.typeProb)
-            #a , an ,the replace candidate
-            self.lstChecksentoptions.append([" ".join(wordLst1+["a"]+wordLstmid + wordLst2),'IN','a'])
-            self.lstChecksentoptions.append([" ".join(wordLst1+["an"]+wordLstmid + wordLst2),'IN','an'])
-            self.lstChecksentoptions.append([" ".join(wordLst1+["the"]+wordLstmid + wordLst2),'IN','the'])
-            #print(self.lstChecksent)
-        else:
-            #the replace candidate
-            self.lstChecksentoptions.append([" ".join(wordLst1+["the"]+wordLstmid + wordLst2),'IN','the'])
+        
+    def reChkRedSize(self):
+        retVal = 0 
+        if self.size==3:                    
+            print("Reducing the Size for the Case of 3 ")
+            genSentence              = GoogleSentList(True,True,True,True,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+            print("Try to remove Right wing")
+            genSentence              = GoogleSentList(True,False,True,True,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+            print("Try to remove left wing")
+            genSentence              = GoogleSentList(False,True,True,True,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+
+            print("Try to remove both wing")
+            genSentence              = GoogleSentList(False,False,True,True,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+
+
+        if self.size<=2:
+            print("Try to remove Right wing")
+            genSentence              = GoogleSentList(True,False,True,False,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+            print("Try to remove left wing")
+            genSentence              = GoogleSentList(False,True,True,False,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
+            print("Try to remove both wing")
+            genSentence              = GoogleSentList(False,False,True,False,self.lstWords,self.start,self.end)
+            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            self.getNgramcount()
+            if self.bestScore>0:
+                return 1
             
-        print(self.lstChecksentoptions)
+        return retVal
         
     def getNgramcount(self):
-        bestScore  = 0
-        bestOpt    = ""
-        bestOptval = ""
+        self.bestScore  = 0
+        self.bestOpt    = ""
+        self.bestOptval = ""
         # get the best value to determine the solution
         for sent,opt,optval in self.lstChecksentoptions:
             #print(sent,opt,optval)
             outVal = cg.qryGoogle(sent)
             print(outVal)
-            if outVal>bestScore:
-                bestScore  = outVal
-                bestOpt    = opt
-                bestOptval = optval
+            if outVal>self.bestScore:
+                self.bestScore  = outVal
+                self.bestOpt    = opt
+                self.bestOptval = optval
         #if no best score is found the solution is not applicable
-        
-        if bestScore ==0:
-            self.solution = [self.start,"NA",""]
+     
+    def scoreCheck(self):   
+        if self.bestScore ==0:
+            if self.reChkRedSize() == 0:
+                self.solution=[self.start,"NA",""]
+            else:
+                self.solution = [self.start,self.bestOpt,self.bestOptval]
         else:
-            self.solution = [self.start,bestOpt,bestOptval]
+            self.solution = [self.start,self.bestOpt,self.bestOptval]
         
     def getSolution(self):
         return self.solution
@@ -230,7 +333,7 @@ lTest  = fileTest.split('\n\n')
 
 
 #for i in range(0,len(lTest)):
-for i in range(8,9):
+for i in range(11,12):
     
     lines = lTest[i].split('\n')
     sentDet = SentenceDetails()    
@@ -244,7 +347,10 @@ for i in range(8,9):
     
        
     #adding in the sentences                
-    print(sentDet.getWords())
+    #print(sentDet.getWords())
+    print(sentDet.words)
+    print(sentDet.synt)
+    print(sentDet.parse)
     sentDet.listProblems()
     sentDet.solveProblem()
     sentLst.addSentence(sentDet.getWords())
