@@ -11,13 +11,15 @@ class GoogleSentList:
     wordLstAfter   = None
     wordLstmid     = None
     lstWords       = None
+    errorType      = None
+    chkMark        = False
     
     lstChecksentoptions = None
     
     start = 0
     end   = 0
     
-    def __init__(self,allowLstBefore, allowLstAfter, allowLstMid, redLstMid, lstWords, prbStart, prbEnd ):
+    def __init__(self,allowLstBefore, allowLstAfter, allowLstMid, redLstMid, objProb ):
         self.allowLstBefore      = allowLstBefore
         self.allowLstAfter       = allowLstAfter
         self.allowLstMid         = allowLstMid
@@ -27,16 +29,23 @@ class GoogleSentList:
         self.wordLstAfter        = []
         self.wordLstmid          = []
         self.lstChecksentoptions = []
-        self.lstWords            = lstWords
-        self.start               = prbStart
-        self.end                 = prbEnd
+        self.lstWords            = objProb.lstWords
+        self.start               = objProb.start
+        self.end                 = objProb.end
+        self.errorType           = objProb.errorType
+        self.chkMark             = objProb.chkMarked
         
     def genSentlist(self,allowLeft,allowRight,typeProb):
+
         if self.reduceLstMid == True:
             startMid = self.start+1
             endMid   = self.end
         else:
             startMid = self.start
+            endMid   = self.end
+
+        if self.chkMark == True:
+            startMid = startMid+1
             endMid   = self.end
         
         if self.allowLstBefore == True:
@@ -45,7 +54,10 @@ class GoogleSentList:
             self.wordLstAfter   = self.lstWords[self.end+1:self.end+allowRight+1]
         if self.allowLstMid == True:
             self.wordLstmid = self.lstWords[startMid:endMid+1]
-        self.lstChecksentoptions.append([" ".join(self.wordLstBefore+self.wordLstmid + self.wordLstAfter),'NA',""])
+            
+        print(self.wordLstmid, startMid,self.start,self.chkMark)
+        if self.allowLstBefore == True:
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore+self.wordLstmid + self.wordLstAfter),'NA',""])
         if typeProb == "NN":
             #a , an ,the replace candidate
             self.lstChecksentoptions.append([" ".join(self.wordLstBefore+["a"]+self.wordLstmid + self.wordLstAfter),'INB','a'])
@@ -59,16 +71,17 @@ class GoogleSentList:
         return (self.lstChecksentoptions)
     
 
-class Problem:
+class ProblemSolution:
     start               = 0
     end                 = 0
     size                = 0
     typeProb            = "" 
-    errorType           = ""  #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
+    errorType           = ""  #Error types are SPEL / ART / ARTChk / SVACOMP /SVABASE / OTHER
     lstWords            = None
     lstChecksentoptions = None
     allowLeft           = 0
     allowRight          = 0
+    chkMarked           = False
     #solution is an array which has 3 para
     #para 1 : start of the word list
     #para 2 : Solution type INB / INA /   NA / REP are the solutions
@@ -82,6 +95,8 @@ class Problem:
         self.typeProb            = typep
         self.problemCondition    = False
         self.errorType           = errorTypeval
+        if self.errorType in ['ArtChk','SPEL']:
+            self.chkMarked       = True
         self.lstWords            = lstWordval
         self.lstChecksentoptions = []
         self.solution            = []
@@ -119,8 +134,8 @@ class Problem:
             
         # Going in the details of the problem
         if self.problemCondition == True:
-            genSentence              = GoogleSentList(True,True,True,False,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(True,True,True,False,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
         else:
             #Solution  is none at this case            
             self.solution=[self.start,"NA",""]
@@ -131,27 +146,27 @@ class Problem:
         retVal = 0 
         if self.size==3:                    
             print("Reducing the Size for the Case of 3 ")
-            genSentence              = GoogleSentList(True,True,True,True,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(True,True,True,True,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
             print("Try to remove Right wing")
-            genSentence              = GoogleSentList(True,False,True,True,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(True,False,True,True,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
             print("Try to remove left wing")
-            genSentence              = GoogleSentList(False,True,True,True,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(False,True,True,True,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
 
             print("Try to remove both wing")
-            genSentence              = GoogleSentList(False,False,True,True,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(False,False,True,True,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
@@ -159,20 +174,20 @@ class Problem:
 
         if self.size<=2:
             print("Try to remove Right wing")
-            genSentence              = GoogleSentList(True,False,True,False,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(True,False,True,False,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
             print("Try to remove left wing")
-            genSentence              = GoogleSentList(False,True,True,False,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(False,True,True,False,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
             print("Try to remove both wing")
-            genSentence              = GoogleSentList(False,False,True,False,self.lstWords,self.start,self.end)
-            self.lstChecksentoptions =  genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+            genSentence              = GoogleSentList(False,False,True,False,self)
+            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
             self.getNgramcount()
             if self.bestScore>0:
                 return 1
@@ -187,6 +202,7 @@ class Problem:
         for sent,opt,optval in self.lstChecksentoptions:
             #print(sent,opt,optval)
             outVal = cg.qryGoogle(sent)
+            print(sent)
             print(outVal)
             if outVal>self.bestScore:
                 self.bestScore  = outVal
@@ -202,31 +218,93 @@ class Problem:
                 self.solution = [self.start,self.bestOpt,self.bestOptval]
         else:
             self.solution = [self.start,self.bestOpt,self.bestOptval]
-        
+            
+        #checking for ArtChk 
+        if self.errorType == 'ArtChk':
+            if self.bestOpt=='NA':
+                self.solution = [self.start,'REP','']
+            elif self.bestOpt=='INB' and self.bestOptval == self.lstWords[self.start]:
+                self.solution = [self.start,'NA','']
+            else:
+                self.solution = [self.start,'REP',self.bestOptval]
     def getSolution(self):
         return self.solution
+
+class ProblemTypeList:
+    lstProblem     = None
+    problemType    = None
+    probStartEar   = 0
+    probEndEar     = 0
+    synErrorEar    = ""
+    
+    def __init__(self,typeProb):
+        self.problemType = typeProb
+        self.lstProblem  = []
+        
+    def addProb(self,prb):
+        probStart,probEnd,synError,errorType = prb
+        
+        if probStart ==self.probStartEar:
+            self.updateLastProb(prb)
+        else:
+            self.lstProblem.append(prb)
+        
+        self.probStartEar = probStart
+        self.probEndEar   = probEnd
+        self.synErrorEar  = synError
+        
+    def updateLastProb(self,prb):
+        self.lstProblem[len(self.lstProblem)-1]=prb
+    
+    def getProblemList(self):
+        return self.lstProblem    
             
 class ProblemList:
-    lstProbclassobj = None
+    lstProbSolnclassobj = None
     lstSolutions    = None
     lstProb         = None
     lstWords        = None
     
-    def __init__(self,lstProbval,lstWordval):
-        self.lstProb         = lstProbval
-        self.lstProbclassobj = []
-        self.lstSolutions    = []
-        self.lstWords        = lstWordval
-        self.genProbObj()
+    #different lists for different error types
+    lstArtChk       = None
+    lstArt          = None
+    lstSpel         = None
+    lstSVABase      = None
+    
+    def __init__(self,lstWordval):
+        self.lstProb             = []
+        self.lstProbSolnclassobj = []
+        self.lstSolutions        = []
+        self.lstWords            = lstWordval
+        #initiate lists
+        self.lstArtChk           = ProblemTypeList("ArtChk")
+        self.lstArt              = ProblemTypeList("ART")
+        self.lstSpel             = ProblemTypeList("SPEL")
+        self.lstSVABase          = ProblemTypeList("SVABASE")
         
-    def genProbObj(self):
+    def AddToProblemListTypewise(self, errorType,prb):
+        if errorType == "ART":
+            self.lstArt.addProb(prb)
+        elif errorType == "ArtChk":
+            self.lstArtChk.addProb(prb)
+        elif errorType == "SPEL":
+            self.lstSpel.addProb(prb)
+        elif errorType == "SVABASE":
+            self.lstSVABase.addProb(prb)
+            
+    def getProbList(self):
+        self.lstProb = self.lstArt.getProblemList() + self.lstArtChk.getProblemList() + self.lstSpel.getProblemList() + self.lstSVABase.getProblemList()
+        self.genProbSolnObj()
+        return self.lstProb
+        
+    def genProbSolnObj(self):
         #adding to problem list
         for start,end,typev,errorType in self.lstProb:
             print(start,end,typev,errorType)
-            self.lstProbclassobj.append(Problem(start,end,typev,errorType,self.lstWords))
+            self.lstProbSolnclassobj.append(ProblemSolution(start,end,typev,errorType,self.lstWords))
     
     def getSolutions(self):
-        for prob in self.lstProbclassobj:
+        for prob in self.lstProbSolnclassobj:
             self.lstSolutions.append(prob.getSolution())
         return self.lstSolutions
 
@@ -244,20 +322,22 @@ class Sentences:
             print(self.lstSent[i])
     
 class SentenceDetails:
-    inds = None
-    words=None
-    synt =None
-    parse=None
-    lstProb = None
-    lstSoln = None
+    inds        = None
+    words       = None
+    synt        = None
+    parse       = None
+    lstProb     = None
+    lstSoln     = None
+    objLstProblems = None
     
     def __init__(self):
-        self.inds    = []
-        self.words   = []
-        self.synt    = []
-        self.parse   = []
-        self.lstProb = []
-        self.lstSoln = []
+        self.inds         = []
+        self.words        = []
+        self.synt         = []
+        self.parse        = []
+        self.lstProb      = []
+        self.lstSoln      = []
+        self.objLstProblems = ProblemList(self.words)
     
     def addItems(self,indval,wordval,syntval,parseval):
         #print(indval,syntval)
@@ -267,25 +347,25 @@ class SentenceDetails:
         self.parse.append(parseval)
         #check for NN and NNS
         if (syntval in ['NN','NNS']):
-            #print("hi")
             rArt = ErrorDef("ART")
             retVal = rArt.checkDeterminer(int(indval),syntval,self)
             if retVal != 0:
-                self.lstProb.append(retVal)
+                probStart,probEnd,syntval,errorType = retVal
+                self.objLstProblems.AddToProblemListTypewise(errorType,retVal)
             
     def getWords(self):
         return self.words
     
     def listProblems(self):
+        self.lstProb = self.objLstProblems.getProbList()
         print(self.lstProb)
                 
     def solveProblem(self):
-        objLstProblems = ProblemList(self.lstProb,self.words)
-        self.lstSoln = objLstProblems.getSolutions()
+        self.lstSoln = self.objLstProblems.getSolutions()
         print(self.lstSoln)
 
 class ErrorDef:
-    #Error types are SPEL / ART / SVACOMP /SVABASE / OTHER
+    #Error types are SPEL / ART / ArtChk / SVACOMP /SVABASE / OTHER
     ErrorType = ""
             
     def __init__(self,etype):
@@ -296,10 +376,10 @@ class ErrorDef:
         ind = indval
         #checking Sibling items for NP so that and also finding Determiner
         condition = True
-        foundDet = False
-        lstParse = []
-        lstWords = []
-        
+        foundDet  = False
+        lstParse  = []
+        lstWords  = []
+        detText   = ""
         probEnd   = 0
         probStart = 0
     
@@ -309,16 +389,19 @@ class ErrorDef:
             lstParse.append(sentDet.parse[ind])
             if (sentDet.synt[ind] == 'DT'):
                 foundDet = True
+                detText  = sentDet.words[ind]
             probStart= ind
             #print(self.synt[ind],self.words[ind],self.parse[ind],condition)
             ind= ind-1
-        if foundDet is False:
-            print("problem found")
             probEnd = indval
-            #self.lstProb.append([probStart,probEnd,syntval])
+        if foundDet is False:
+            print("problem found")            
             return [probStart,probEnd,syntval,self.ErrorType]
         else:
             foundDet = False
+            self.ErrorType = "ArtChk"
+            if detText in ['a','an','the','']:
+                return [probStart,probEnd,syntval,self.ErrorType]
         return 0
         
             
@@ -333,7 +416,7 @@ lTest  = fileTest.split('\n\n')
 
 
 #for i in range(0,len(lTest)):
-for i in range(11,12):
+for i in range(19,20):
     
     lines = lTest[i].split('\n')
     sentDet = SentenceDetails()    
@@ -349,8 +432,6 @@ for i in range(11,12):
     #adding in the sentences                
     #print(sentDet.getWords())
     print(sentDet.words)
-    print(sentDet.synt)
-    print(sentDet.parse)
     sentDet.listProblems()
     sentDet.solveProblem()
     sentLst.addSentence(sentDet.getWords())
