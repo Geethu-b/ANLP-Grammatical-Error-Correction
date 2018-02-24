@@ -82,6 +82,7 @@ class ProblemSolution:
     allowLeft           = 0
     allowRight          = 0
     chkMarked           = False
+    chkWord             = ""
     #solution is an array which has 3 para
     #para 1 : start of the word list
     #para 2 : Solution type INB / INA /   NA / REP are the solutions
@@ -97,6 +98,7 @@ class ProblemSolution:
         self.errorType           = errorTypeval
         if self.errorType in ['ArtChk','SPEL']:
             self.chkMarked       = True
+            self.chkWord         = lstWordval[self.start]
         self.lstWords            = lstWordval
         self.lstChecksentoptions = []
         self.solution            = []
@@ -202,8 +204,15 @@ class ProblemSolution:
         for sent,opt,optval in self.lstChecksentoptions:
             #print(sent,opt,optval)
             outVal = cg.qryGoogle(sent)
-            print(sent)
+            #setting threshold to 1000
+            if outVal < 500:
+                outVal =0
+            #giving a extra score for ArtChk Checked Word
+            if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
+                outVal +=20000
+            print(sent,opt,optval,self.chkWord)
             print(outVal)
+            
             if outVal>self.bestScore:
                 self.bestScore  = outVal
                 self.bestOpt    = opt
@@ -233,9 +242,9 @@ class ProblemSolution:
 class ProblemTypeList:
     lstProblem     = None
     problemType    = None
-    probStartEar   = 0
-    probEndEar     = 0
-    synErrorEar    = ""
+    probStartEar   = None
+    probEndEar     = None
+    synErrorEar    = None
     
     def __init__(self,typeProb):
         self.problemType = typeProb
@@ -243,6 +252,7 @@ class ProblemTypeList:
         
     def addProb(self,prb):
         probStart,probEnd,synError,errorType = prb
+        print(prb)
         
         if probStart ==self.probStartEar:
             self.updateLastProb(prb)
@@ -363,6 +373,23 @@ class SentenceDetails:
     def solveProblem(self):
         self.lstSoln = self.objLstProblems.getSolutions()
         print(self.lstSoln)
+    
+    def getSolutionInSentence(self):
+        #sort the list of solutions
+        self.lstSoln.sort(key=lambda x: x[0])
+        for ind,Operation,Operand in self.lstSoln[::-1]:
+            print (ind,Operation,Operand)
+            if Operation == 'INB':  
+                print("hello")
+                self.words= self.words[0:ind]+[Operand]+self.words[ind:len(self.words)+1]
+            elif Operation == 'REP':
+                print(self.words[0:ind],[Operand])
+                if Operand == '':
+                    self.words= self.words[0:ind]+self.words[ind+1:len(self.words)+1]
+                else:
+                    self.words= self.words[0:ind]+[Operand]+self.words[ind+1:len(self.words)+1]
+                
+        #print(self.lstSoln)
 
 class ErrorDef:
     #Error types are SPEL / ART / ArtChk / SVACOMP /SVABASE / OTHER
@@ -387,7 +414,7 @@ class ErrorDef:
             condition = 'NP' not in sentDet.parse[ind]
             lstWords.append(sentDet.words[ind])
             lstParse.append(sentDet.parse[ind])
-            if (sentDet.synt[ind] == 'DT'):
+            if (sentDet.synt[ind] in ['DT','PRP$']):
                 foundDet = True
                 detText  = sentDet.words[ind]
             probStart= ind
@@ -416,7 +443,7 @@ lTest  = fileTest.split('\n\n')
 
 
 #for i in range(0,len(lTest)):
-for i in range(19,20):
+for i in range(3,4):
     
     lines = lTest[i].split('\n')
     sentDet = SentenceDetails()    
@@ -430,13 +457,11 @@ for i in range(19,20):
     
        
     #adding in the sentences                
-    #print(sentDet.getWords())
     print(sentDet.words)
     sentDet.listProblems()
     sentDet.solveProblem()
-    sentLst.addSentence(sentDet.getWords())
-    #print(synt)
-    #print(parse)
+    sentDet.getSolutionInSentence()
 
+    sentLst.addSentence(sentDet.getWords())
 
 sentLst.printSentences()
