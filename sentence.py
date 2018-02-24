@@ -2,9 +2,11 @@ import problemlist as prbList
 import ErrorDef as errDef
 
 class Sentences:
-    lstSent =None
+    lstSent = None
+    outStr  = None
     def __init__(self):
-        self.lstSent=[]
+        self.lstSent = []
+        self.outStr  = ""
     
     def addSentence(self,words):
         #print(words)
@@ -12,7 +14,10 @@ class Sentences:
     
     def printSentences(self):
         for i in range(0,len(self.lstSent)):
-            print(self.lstSent[i])
+            self.outStr = self.outStr +self.lstSent[i] + "\n"
+            
+        print(self.outStr)
+    
     
 class SentenceDetails:
     inds        = None

@@ -8,11 +8,11 @@ sentLst = sent.Sentences()
 fileTest  = open("testdata1.con","r").read()
 #listing the values according to the sentences
 lTest  = fileTest.split('\n\n')
-#print(lTest[2])
+
 
 
 #for i in range(0,len(lTest)):
-for i in range(0,40):
+for i in range(0,4):
     
     lines = lTest[i].split('\n')
     sentDet = sent.SentenceDetails()    
@@ -34,3 +34,7 @@ for i in range(0,40):
     sentLst.addSentence(sentDet.getWords())
 
 sentLst.printSentences()
+#writing to a file 
+fileW = open("m2file.txt","w")
+fileW.write(sentLst.outStr)
+fileW.close()
