@@ -5,7 +5,7 @@ import phrasefinder as pf
 
 def qryGoogle(qryStr):
     """Requests the PhraseFinder web service and prints out the result."""
-    print(qryStr)
+    #print(qryStr)
     # Set up your query.
     query = qryStr
 
