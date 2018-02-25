@@ -1,3 +1,5 @@
+import inflect
+p = inflect.engine()
 
 class ErrorDef:
     #Error types are SPEL / ART / ArtChk / SVACOMP /SVABASE / OTHER
@@ -41,5 +43,34 @@ class ErrorDef:
             if detText in ['a','an','the','']:
                 return [probStart,probEnd,syntval,self.ErrorType]
         return 0
-        
+    
+    def checkSVACOMP(self, subj, subjind, verb, verbind, syntval, sentDet):
+        if str(p.singular_noun(subj)) == "False":#subj is singular
+            print("singular")
+            plural_verb = p.plural_verb(verb)
+            if verb != plural_verb:
+                return 0
+                #print("good")
+            else:
+                print("SVA problem found")
+                return [subjind,verbind,syntval,self.ErrorType]
+                
+        else:
+            print("plural")
+            plural_verb = p.plural_verb(verb)
+            if verb == plural_verb:
+                return 0
+                #print("good")
+            else:
+                print("SVA problem found")
+                return [subjind,verbind,syntval,self.ErrorType]
+                #print("bad")
+    
+    def checkSVACOMPplural(self, verb, verbind, syntval, sentDet):
+        plural_verb = p.plural_verb(verb)
+        #print(plural_verb)
+        if verb == plural_verb:
+            return 0
+        else:
+            return [verbind,verbind,syntval,self.ErrorType]
     
