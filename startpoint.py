@@ -28,7 +28,8 @@ for i in range(1000,1312):
         if len(lines[j])>0:
             elements = lines[j].split('\t')
             #print(elements[3],elements[4],elements[5],elements[8])
-            sentDet.addItems(elements[3],elements[4],elements[5],elements[8])
+            #sentDet.addItems(elements[3],elements[4],elements[5],elements[8])
+            sentDet.addItems(elements[3],elements[4],elements[5],elements[8],elements[6],elements[7])
 
 
        
