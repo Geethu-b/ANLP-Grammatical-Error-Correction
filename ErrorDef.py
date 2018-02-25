@@ -1,3 +1,5 @@
+import inflect
+p = inflect.engine()
 
 class ErrorDef:
     #Error types are SPEL / ART / ArtChk / SVACOMP /SVABASE / OTHER
