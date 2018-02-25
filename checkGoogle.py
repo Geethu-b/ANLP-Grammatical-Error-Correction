@@ -29,6 +29,7 @@ def qryGoogle(qryStr):
 
     except Exception as error:
         print('Some error occurred: {}'.format(error))
+        raise
     
     return retval
     

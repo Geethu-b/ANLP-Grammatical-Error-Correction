@@ -133,21 +133,25 @@ class ProblemSolution:
         self.bestOptval = ""
         # get the best value to determine the solution
         for sent,opt,optval in self.lstChecksentoptions:
-            #print(sent,opt,optval)
-            outVal = cg.qryGoogle(sent)
-            #setting threshold to 1000
-            if outVal < 500:
-                outVal =0
-            #giving a extra score for ArtChk Checked Word
-            if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
-                outVal +=20000
-            print(sent,opt,optval,self.chkWord)
-            print(outVal)
-            
-            if outVal>self.bestScore:
-                self.bestScore  = outVal
-                self.bestOpt    = opt
-                self.bestOptval = optval
+            print(sent,opt,optval)
+            try:
+                outVal = cg.qryGoogle(sent)
+                #setting threshold to 1000
+                if outVal < 500:
+                    outVal =0
+                #giving a extra score for ArtChk Checked Word
+                if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
+                    outVal +=20000
+                print(sent,opt,optval,self.chkWord)
+                print(outVal)
+                
+                if outVal>self.bestScore:
+                    self.bestScore  = outVal
+                    self.bestOpt    = opt
+                    self.bestOptval = optval
+            except:
+                print("In the error")
+                self.lstChecksentoptions.append([sent,opt,optval])
         #if no best score is found the solution is not applicable
      
     def scoreCheck(self):   

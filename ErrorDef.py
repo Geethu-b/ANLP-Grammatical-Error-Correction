@@ -19,7 +19,10 @@ class ErrorDef:
         probStart = 0
     
         while (condition):
+            #print(ind , "problem here")
             condition = 'NP' not in sentDet.parse[ind]
+            if(ind==0):
+                condition = False
             lstWords.append(sentDet.words[ind])
             lstParse.append(sentDet.parse[ind])
             if (sentDet.synt[ind] in ['DT','PRP$']):
