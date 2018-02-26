@@ -1,3 +1,6 @@
+
+import enchant
+from enchant.checker import SpellChecker
 import inflect
 p = inflect.engine()
 
@@ -44,46 +47,53 @@ class ErrorDef:
                 return [probStart,probEnd,syntval,self.ErrorType]
         return 0
     
-    def checkSVACOMP(self, subj, subjind, verb, verbind, syntverb, sentDet):
-        IS_KNOWN_PLURAL = False
-        print(subj, verb)
-        if subj == "I":
-            if p.plural(verb) == "are":
-                if verb != "am":
-                    print("SVA problem found: ", subj, verb)
-                    return [subjind,verbind,syntverb,self.ErrorType]
-                else:
-                    return 0
-            else:
-                IS_KNOWN_PLURAL = True
-        elif subj in ["you", "they", "we"]:
-            IS_KNOWN_PLURAL = True
-        elif str(p.singular_noun(subj)) == "False":#subj is singular
-            if syntverb == "VBZ":
+    def checkSVACOMP(self, subj, subjind, verb, verbind, syntval, sentDet):
+        if str(p.singular_noun(subj)) == "False":#subj is singular
+            print("singular")
+            plural_verb = p.plural_verb(verb)
+            if verb != plural_verb:
                 return 0
-            if verb == "were":
-                print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
-            elif syntverb in ["VBD", "VBN", "MD"]:
-                return 0
+                #print("good")
             else:
-                print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
-        IS_KNOWN_PLURAL = True		
-        if IS_KNOWN_PLURAL:
-            if syntverb in ["VBZ", "am"]:
-                print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
-            else:
+                print("SVA problem found")
+                return [subjind,verbind,syntval,self.ErrorType]
+                
+        else:
+            print("plural")
+            plural_verb = p.plural_verb(verb)
+            if verb == plural_verb:
                 return 0
-        print("WTF?")
-	
+                #print("good")
+            else:
+                print("SVA problem found")
+                return [subjind,verbind,syntval,self.ErrorType]
+                #print("bad")
+    
     def checkSVACOMPplural(self, verb, verbind, syntval, sentDet):
         plural_verb = p.plural_verb(verb)
-        print(plural_verb)
+        #print(plural_verb)
         if verb == plural_verb:
             return 0
         else:
-            print("SVA Plural problem found: ", verb)
             return [verbind,verbind,syntval,self.ErrorType]
+        
+    def checkSpel(self, indval,word,sentDet):
+        #word = "txt"
+        d = enchant.Dict("en_US")
+        chkr = SpellChecker("en_US")
+        chkr.set_text(word)
+        
+        #print(chkr)
+        for err in chkr:
+            print (err.word)
+            #probStart = [i for i, j in enumerate([words]) if j == err.word]
+            #probEnd   = probStart + len(err.word)
+            suggList  = d.suggest(err.word)
+            print(suggList)
+            return [indval,indval+1,suggList,self.ErrorType]
+            #lstSpel.append([probStart, probEnd, suggList, "SPEL"])
+        return 0
+    
+    
+        
     
