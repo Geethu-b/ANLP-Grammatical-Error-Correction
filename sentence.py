@@ -24,6 +24,8 @@ class SentenceDetails:
     words       = None
     synt        = None
     parse       = None
+    depnum      = None
+    dep_tag     = None
     lstProb     = None
     lstSoln     = None
     objLstProblems = None
@@ -33,16 +35,20 @@ class SentenceDetails:
         self.words        = []
         self.synt         = []
         self.parse        = []
+        self.dep_ind       = []
+        self.dep_tag      = []
         self.lstProb      = []
         self.lstSoln      = []
         self.objLstProblems = prbList.ProblemList(self.words)
     
-    def addItems(self,indval,wordval,syntval,parseval):
+    def addItems(self,indval,wordval,syntval,parseval,depnumval, depvalue):
         #print(indval,syntval)
         self.inds.append(indval)
         self.words.append(wordval)
         self.synt.append(syntval)
         self.parse.append(parseval)
+        self.dep_ind.append(depnumval)
+        self.dep_tag.append(depvalue)
         #check for NN and NNS
         if (syntval in ['NN','NNS']):
             rArt = errDef.ErrorDef("ART")
@@ -124,12 +130,12 @@ class SentenceDetails:
                 if and_subj and verb_ind != -4:
                     #give verb to function asking if it's plural
                     print(self.dep_tag[verb_ind],self.words[verb_ind])
-                    rComp = ErrorDef("SVACOMPplural")
+                    rComp = errDef.ErrorDef("SVACOMPplural")
                     retComp = rComp.checkSVACOMPplural(self.words[verb_ind],verb_ind,syntval,self)
                     if retComp != 0:
                         self.lstProb.append(retComp)
                 elif subject_ind != -2 and verb_ind != -4:
-                    rComp = ErrorDef("SVACOMP")
+                    rComp = errDef.ErrorDef("SVACOMP")
                     retComp = rComp.checkSVACOMP(self.words[subject_ind],subject_ind,self.words[verb_ind],verb_ind,syntval,self)
                     if retComp != 0:
                         self.lstProb.append(retComp)
