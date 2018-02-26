@@ -24,7 +24,7 @@ class SentenceDetails:
     words       = None
     synt        = None
     parse       = None
-    depnum      = None
+    dep_ind     = None
     dep_tag     = None
     lstProb     = None
     lstSoln     = None
@@ -35,7 +35,7 @@ class SentenceDetails:
         self.words        = []
         self.synt         = []
         self.parse        = []
-        self.dep_ind       = []
+        self.dep_ind      = []
         self.dep_tag      = []
         self.lstProb      = []
         self.lstSoln      = []
