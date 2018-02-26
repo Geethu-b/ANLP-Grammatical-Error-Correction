@@ -135,7 +135,7 @@ class ProblemSolution:
         self.bestOptval = ""
         # get the best value to determine the solution
         for sent,opt,optval in self.lstChecksentoptions:
-            print(sent,opt,optval)
+            #print(sent,opt,optval)
             try:
                 outVal = cg.qryGoogle(sent)
                 #setting threshold to 1000
@@ -144,8 +144,8 @@ class ProblemSolution:
                 #giving a extra score for ArtChk Checked Word
                 if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
                     outVal +=20000
-                print(sent,opt,optval,self.chkWord)
-                print(outVal)
+                #print(sent,opt,optval,self.chkWord)
+                #print(outVal)
                 
                 if outVal>self.bestScore:
                     self.bestScore  = outVal
