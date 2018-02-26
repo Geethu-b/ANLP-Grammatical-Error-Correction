@@ -31,11 +31,13 @@ class ProblemSolution:
             self.chkWord         = lstWordval[self.start]
         self.lstWords            = lstWordval
         self.lstChecksentoptions = []
-        self.solution            = []
-        self.genChecklist()
-        if self.problemCondition == True:
-            self.getNgramcount()
-            self.scoreCheck()
+        self.solution            = [0,0,0]
+        
+        if self.errorType in ['ART','ArtChk','SPEL']:
+            self.genChecklist()
+            if self.problemCondition == True:
+                self.getNgramcount()
+                self.scoreCheck()
 
     
     def genChecklist(self):        

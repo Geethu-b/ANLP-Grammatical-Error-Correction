@@ -131,14 +131,20 @@ class SentenceDetails:
                     #give verb to function asking if it's plural
                     print(self.dep_tag[verb_ind],self.words[verb_ind])
                     rComp = errDef.ErrorDef("SVACOMPplural")
+                    
                     retComp = rComp.checkSVACOMPplural(self.words[verb_ind],verb_ind,syntval,self)
+                    
                     if retComp != 0:
-                        self.lstProb.append(retComp)
+                        print(self.words[subject_ind], self.words[verb_ind])
+                        self.objLstProblems.AddToProblemListTypewise("SVACOMPplural",retComp)
                 elif subject_ind != -2 and verb_ind != -4:
                     rComp = errDef.ErrorDef("SVACOMP")
+                    
                     retComp = rComp.checkSVACOMP(self.words[subject_ind],subject_ind,self.words[verb_ind],verb_ind,syntval,self)
                     if retComp != 0:
-                        self.lstProb.append(retComp)
-                    print(self.dep_tag[subject_ind],self.words[subject_ind])
-                    print(self.dep_tag[verb_ind],self.words[verb_ind])
+                        print(self.words[subject_ind], self.words[verb_ind])
+                        self.objLstProblems.AddToProblemListTypewise("SVACOMP",retComp)
+
+                    #print(self.dep_tag[subject_ind],self.words[subject_ind])
+                    #print(self.dep_tag[verb_ind],self.words[verb_ind])
                 

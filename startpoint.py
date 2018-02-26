@@ -12,9 +12,8 @@ lTest  = fileTest.split('\n\n')
 #manually adding some 23
 lTest.insert(23,"1	4	2	31	''	''	-	-	*))")
 
-
 #for i in range(0,len(lTest)):
-for i in range(1000,1005):
+for i in range(28,29):
     
     lines = lTest[i].split('\n')
     sentDet = sent.SentenceDetails()    
@@ -33,6 +32,7 @@ for i in range(1000,1005):
     #adding in the sentences                
     print(sentDet.words)
     sentDet.listProblems()
+    print(sentDet.lstProb)
     sentDet.solveProblem()
     sentDet.getSolutionInSentence()
 

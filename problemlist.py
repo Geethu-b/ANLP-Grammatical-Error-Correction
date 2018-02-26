@@ -41,6 +41,8 @@ class ProblemList:
     lstArt          = None
     lstSpel         = None
     lstSVABase      = None
+    lstSVAComp      = None
+    lstSVACompPlu   = None
     
     def __init__(self,lstWordval):
         self.lstProb             = []
@@ -52,6 +54,8 @@ class ProblemList:
         self.lstArt              = ProblemTypeList("ART")
         self.lstSpel             = ProblemTypeList("SPEL")
         self.lstSVABase          = ProblemTypeList("SVABASE")
+        self.lstSVAComp          = ProblemTypeList("SVACOMP")
+        self.lstSVACompPlu          = ProblemTypeList("SVACOMPplural")
         
     def AddToProblemListTypewise(self, errorType,prb):
         if errorType == "ART":
@@ -62,9 +66,13 @@ class ProblemList:
             self.lstSpel.addProb(prb)
         elif errorType == "SVABASE":
             self.lstSVABase.addProb(prb)
+        elif errorType == "SVACOMP":
+            self.lstSVAComp.addProb(prb)
+        elif errorType == "SVACOMPplural":
+            self.lstSVACompPlu.addProb(prb)
             
     def getProbList(self):
-        self.lstProb = self.lstArt.getProblemList() + self.lstArtChk.getProblemList() + self.lstSpel.getProblemList() + self.lstSVABase.getProblemList()
+        self.lstProb = self.lstArt.getProblemList() + self.lstArtChk.getProblemList() + self.lstSpel.getProblemList() + self.lstSVABase.getProblemList() +self.lstSVAComp.getProblemList() +self.lstSVACompPlu.getProblemList()
         self.genProbSolnObj()
         return self.lstProb
         
