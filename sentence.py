@@ -100,9 +100,10 @@ class SentenceDetails:
             if self.dep_tag[index] in ["nsubj", "nsubjpass"]:
                 subject_ind = int(self.inds[index])
                 subject_ref_ind = int(self.dep_ind[index])
-                print (subject_ind)
+                #print (subject_ind)
                 if self.dep_tag[subject_ref_ind]=="rcmod":
                     subject_ind = int(self.dep_ind[subject_ref_ind])
+				
                 for conj in range(len(self.inds)):
                     if self.dep_ind[conj] == str(subject_ind) and self.dep_tag[conj]=="cc":
                         if self.words[conj]=="and":
@@ -116,6 +117,7 @@ class SentenceDetails:
                     if self.dep_ind[verb] == str(subject_ref_ind):
                         if self.dep_tag[verb] in ["aux", "cop"]:
                             verb_ind=verb
+                            break
                         elif self.dep_tag[verb] == "auxpass":
                             auxpass_ind = verb
                         #elif self.dep_tag[verb] == "conj":
@@ -126,25 +128,20 @@ class SentenceDetails:
                     else:
                         verb_ind = auxpass_ind
                         #other_verbs = []
-                syntval = self.synt [verb_ind]
+                syntverb = self.synt [verb_ind]	
                 if and_subj and verb_ind != -4:
                     #give verb to function asking if it's plural
-                    print(self.dep_tag[verb_ind],self.words[verb_ind])
+                    print(self.words[verb_ind])
+                    #rComp = errDef.ErrorDef("X")
                     rComp = errDef.ErrorDef("SVACOMPplural")
-                    
-                    retComp = rComp.checkSVACOMPplural(self.words[verb_ind],verb_ind,syntval,self)
-                    
+                    retComp = rComp.checkSVACOMPplural(self.words[verb_ind],verb_ind,syntverb,self)
                     if retComp != 0:
-                        print(self.words[subject_ind], self.words[verb_ind])
                         self.objLstProblems.AddToProblemListTypewise("SVACOMPplural",retComp)
                 elif subject_ind != -2 and verb_ind != -4:
+                    #print(self.words[verb_ind])
                     rComp = errDef.ErrorDef("SVACOMP")
-                    
-                    retComp = rComp.checkSVACOMP(self.words[subject_ind],subject_ind,self.words[verb_ind],verb_ind,syntval,self)
+                    retComp = rComp.checkSVACOMP(self.words[subject_ind],subject_ind,self.words[verb_ind],verb_ind,syntverb,self)
+                    print(retComp)
                     if retComp != 0:
-                        print(self.words[subject_ind], self.words[verb_ind])
                         self.objLstProblems.AddToProblemListTypewise("SVACOMP",retComp)
-
-                    #print(self.dep_tag[subject_ind],self.words[subject_ind])
-                    #print(self.dep_tag[verb_ind],self.words[verb_ind])
                 
