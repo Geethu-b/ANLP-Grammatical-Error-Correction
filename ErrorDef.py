@@ -1,6 +1,4 @@
-`
-import enchant
-from enchant.checker import SpellChecker
+import spelchek
 import inflect
 p = inflect.engine()
 
@@ -78,22 +76,17 @@ class ErrorDef:
             return [verbind,verbind,syntval,self.ErrorType]
         
     def checkSpel(self, indval,word,sentDet):
-        #word = "txt"
-        d = enchant.Dict("en_US")
-        chkr = SpellChecker("en_US")
-        chkr.set_text(word)
         
-        #print(chkr)
-        for err in chkr:
-            print (err.word)
-            #probStart = [i for i, j in enumerate([words]) if j == err.word]
-            #probEnd   = probStart + len(err.word)
-            suggList  = d.suggest(err.word)
-            print(suggList)
+        word = word.lower()
+        checkedWord =spelchek.correct(word) 
+        # not spell checked words
+        if word in [',','.',"'"]:
+            return 0
+        if checkedWord == word:
+            return 0
+        else:
+            suggList = spelchek.guesses(word)
+            suggList.append(checkedWord)
             return [indval,indval+1,suggList,self.ErrorType]
-            #lstSpel.append([probStart, probEnd, suggList, "SPEL"])
-        return 0
-    
-    
-        
+      
     

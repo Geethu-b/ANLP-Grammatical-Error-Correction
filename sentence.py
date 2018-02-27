@@ -49,6 +49,11 @@ class SentenceDetails:
         self.parse.append(parseval)
         self.dep_ind.append(depnumval)
         self.dep_tag.append(depvalue)
+        #checking for spell checking errors
+        rSpel = errDef.ErrorDef("SPEL")
+        retValSpel = rSpel.checkSpel(int(indval),wordval,self)
+        if retValSpel != 0:
+            self.objLstProblems.AddToProblemListTypewise("SPEL",retValSpel)
         #check for NN and NNS
         if (syntval in ['NN','NNS']):
             rArt = errDef.ErrorDef("ART")
