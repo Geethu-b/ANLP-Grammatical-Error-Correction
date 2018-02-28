@@ -88,5 +88,14 @@ class ErrorDef:
             suggList = spelchek.guesses(word)
             suggList.append(checkedWord)
             return [indval,indval+1,suggList,self.ErrorType]
+
+    def checkOther(self,indval,syntval,sentDet):
+        validtags = ['JJ','JJR','JJS','NNS','NN','NNP','NNPS','RB','RBR','RBS','VB','VBD','VBG','VBN','VBZ']
+        if syntval in validtags:
+            return [indval,indval+1,syntval,self.ErrorType]
+        else:
+            return 0    
+        
+
       
     
