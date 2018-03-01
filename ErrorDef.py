@@ -45,34 +45,62 @@ class ErrorDef:
                 return [probStart,probEnd,syntval,self.ErrorType]
         return 0
     
-    def checkSVACOMP(self, subj, subjind, verb, verbind, syntval, sentDet):
-        if str(p.singular_noun(subj)) == "False":#subj is singular
-            print("singular")
-            plural_verb = p.plural_verb(verb)
-            if verb != plural_verb:
-                return 0
-                #print("good")
+    def checkSVACOMP(self, subj, subjind, verb, verbind, syntverb, sentDet):
+        IS_KNOWN_PLURAL = False
+        #subj = subj.lower()
+        verb = verb.lower()
+        print(subj, verb)
+        if subj == "I":
+            if p.plural(verb) == "are":
+                if verb != "am":
+                    print("SVA problem found: ", subj, verb)
+                    return [subjind,verbind,syntverb,self.ErrorType]
+                else:
+                    return 0
             else:
-                print("SVA problem found")
-                return [subjind,verbind,syntval,self.ErrorType]
-                
+                IS_KNOWN_PLURAL = True
+        elif subj.lower() in ["you", "they", "we", "both", "most"]:
+            IS_KNOWN_PLURAL = True
+        elif str(p.singular_noun(subj)) == "False":#subj is singular
+            IS_KNOWN_PLURAL = False
+        elif subj.lower() in ["nothing", "this"]:
+            IS_KNOWN_PLURAL = False
         else:
-            print("plural")
-            plural_verb = p.plural_verb(verb)
-            if verb == plural_verb:
-                return 0
-                #print("good")
+            IS_KNOWN_PLURAL = True	#NNS NNPS
+        #print(IS_KNOWN_PLURAL)
+        if IS_KNOWN_PLURAL:
+            if syntverb in ["VBZ"]:
+                print("SVA problem found: ", subj, verb)
+                return [subjind,verbind,syntverb,self.ErrorType]
+            elif verb in ["was"]:
+                print("SVA problem found: ", subj, verb)
+                return [subjind,verbind,syntverb,self.ErrorType]
             else:
-                print("SVA problem found")
-                return [subjind,verbind,syntval,self.ErrorType]
-                #print("bad")
-    
+                #print(subj)
+                return 0
+        else:
+            if syntverb == "VBZ":
+                #print(subj)
+                return 0
+            elif verb == "were":
+                print("SVA problem found: ", subj, verb)
+                return [subjind,verbind,syntverb,self.ErrorType]
+            elif syntverb in ["VBD", "VBN", "MD"]:
+                #print(subj)
+                return 0
+            else:
+                print("SVA problem found: ", subj, verb)
+                return [subjind,verbind,syntverb,self.ErrorType]
+
+        print("This should not happen?")
+	
     def checkSVACOMPplural(self, verb, verbind, syntval, sentDet):
         plural_verb = p.plural_verb(verb)
-        #print(plural_verb)
+        print(plural_verb)
         if verb == plural_verb:
             return 0
         else:
+            print("SVA Plural problem found: ", verb)
             return [verbind,verbind,syntval,self.ErrorType]
         
     def checkSpel(self, indval,word,sentDet):
