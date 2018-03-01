@@ -47,6 +47,7 @@ class ErrorDef:
     
     def checkSVACOMP(self, subj, subjind, verb, verbind, syntverb, sentDet):
         IS_KNOWN_PLURAL = False
+        CHANGE = "" #TO_3TH_PERSON, TO_PLURAL
         #subj = subj.lower()
         verb = verb.lower()
         print(subj, verb)
@@ -54,11 +55,19 @@ class ErrorDef:
             if p.plural(verb) == "are":
                 if verb != "am":
                     print("SVA problem found: ", subj, verb)
-                    return [subjind,verbind,syntverb,self.ErrorType]
+                    return [subjind,verbind,"TO_AM",self.ErrorType]
+                else:
+                    return 0
+            #else:
+                #IS_KNOWN_PLURAL = True
+            elif p.plural(verb) == "were":
+                if verb != "was":
+                    print("SVA problem found: ", subj, verb)
+                    return [subjind,verbind,"TO_WAS",self.ErrorType]
                 else:
                     return 0
             else:
-                IS_KNOWN_PLURAL = True
+                IS_KNOWN_PLURAL = True				
         elif subj.lower() in ["you", "they", "we", "both", "most"]:
             IS_KNOWN_PLURAL = True
         elif str(p.singular_noun(subj)) == "False":#subj is singular
@@ -71,10 +80,12 @@ class ErrorDef:
         if IS_KNOWN_PLURAL:
             if syntverb in ["VBZ"]:
                 print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
+                CHANGE = "TO_PLURAL"
+                return [subjind,verbind,CHANGE,self.ErrorType]
             elif verb in ["was"]:
+                CHANGE = "TO_PLURAL"
                 print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
+                return [subjind,verbind,CHANGE,self.ErrorType]
             else:
                 #print(subj)
                 return 0
@@ -83,14 +94,16 @@ class ErrorDef:
                 #print(subj)
                 return 0
             elif verb == "were":
+                CHANGE = "TO_3TH_PERSON"
                 print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
+                return [subjind,verbind,CHANGE,self.ErrorType]
             elif syntverb in ["VBD", "VBN", "MD"]:
                 #print(subj)
                 return 0
             else:
+                CHANGE = "TO_3TH_PERSON"
                 print("SVA problem found: ", subj, verb)
-                return [subjind,verbind,syntverb,self.ErrorType]
+                return [subjind,verbind,CHANGE,self.ErrorType]
 
         print("This should not happen?")
 	
