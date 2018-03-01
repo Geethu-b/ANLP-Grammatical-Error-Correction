@@ -1,6 +1,15 @@
 import sentence as sent
+import pickle
 
-        
+def save_obj(obj, name ):
+    #with open('obj/'+ name + '.pkl', 'wb') as f:
+        fh = open(name+'.pkl',"wb")
+        pickle.dump(obj, fh, pickle.HIGHEST_PROTOCOL)
+
+def load_obj(name ):
+    fh = open(name+'.pkl',"rb")
+    return pickle.load(fh)
+      
 #function for generation of list of words
 sentLst = sent.Sentences()
 
@@ -10,13 +19,16 @@ fileTest  = open("testdata1.con","r").read()
 lTest  = fileTest.split('\n\n')
 
 #manually adding some 23
-lTest.insert(23,"1	4	2	31	''	''	-	-	*))")
+lTest.insert(23,"1	4	2	0	''	''	-	-	*))")
 
-for i in range(0,len(lTest)):
-#for i in range(12,13):
+#read the other type error problem list
+lstOther = load_obj("lstOther")
+    
+#for i in range(0,len(lTest)):
+for i in range(91,92):
     
     lines = lTest[i].split('\n')
-    sentDet = sent.SentenceDetails()    
+    sentDet = sent.SentenceDetails(i,lstOther)    
     #Number of lines to go
     targetLines = len(lines)
     if i == 22:

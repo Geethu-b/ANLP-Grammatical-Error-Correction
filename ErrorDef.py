@@ -10,6 +10,18 @@ class ErrorDef:
         self.ErrorType = etype
     
     #Determine the Article Determiner  error        
+#    def checkSVAbasic(self,indval,syntval,sentDet):
+#        curSynval = syntval
+#        earSynval = sentDet.synt[indval-1]
+#        
+#        if(earSynval in ['NNS','NNSP'] and curSynval in ['VBZ']):
+#            return [indval-1,indval,sentDet.words[indval],self.ErrorType]
+#        return 0
+            
+        
+        
+        
+    #Determine the Article Determiner  error        
     def checkDeterminer(self,indval,syntval,sentDet):
         ind = indval
         #checking Sibling items for NP so that and also finding Determiner
@@ -121,8 +133,9 @@ class ErrorDef:
         word = word.lower()
         checkedWord =spelchek.correct(word) 
         # not spell checked words
-        if word in [',','.',"'"]:
+        if word in [',','.',"'",'?',"''"]:
             return 0
+        
         if checkedWord == word:
             return 0
         else:

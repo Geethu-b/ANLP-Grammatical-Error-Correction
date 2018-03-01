@@ -1,5 +1,7 @@
 import GoogleSentList as googSentList
 import checkGoogle as cg
+from word_forms.word_forms import get_word_forms
+
 
 class ProblemSolution:
     start               = 0
@@ -26,20 +28,114 @@ class ProblemSolution:
         self.typeProb            = typep
         self.problemCondition    = False
         self.errorType           = errorTypeval
-        if self.errorType in ['ArtChk','SPEL']:
+        if self.errorType in ['ArtChk']:
             self.chkMarked       = True
             self.chkWord         = lstWordval[self.start]
         self.lstWords            = lstWordval
         self.lstChecksentoptions = []
         self.solution            = [0,0,0]
         
+        if self.errorType == 'OTHER':
+            self.getOthersolution()
+            self.getNgramcount()
+            self.scoreCheck()
+
+            
         if self.errorType in ['ART','ArtChk','SPEL']:
             self.genChecklist()
             if self.problemCondition == True:
                 self.getNgramcount()
                 self.scoreCheck()
+        if self.errorType in ['SVACOMP','SVACOMPplural']:
+            self.getSVASolution()
+            
 
+    def getSVASolution(self):
+        startPos        = self.end
+        self.bestOpt    = "REP"
+        self.bestOptval = self.getCorrectVerb(self.lstWords[startPos],self.typeProb)
+        self.solution   = [startPos,self.bestOpt,self.bestOptval]
+        
+        
+    def getCorrectVerb(self,verb, option):
+        retval = ""
+        if option == 'TO_PLURAL':
+            retval = self.to_plural(verb)
+        elif option == 'TO_3TH_PERSON':
+            retval = self.to_3th_person(verb)
+        elif option == 'TO_WAS':
+            retval = "was"
+        elif option == 'TO_AM':
+            retval = "am"
+        
+        return retval
+            
+
+    def to_plural(self,verb):
+        if verb == "is":
+            return "are"
+        if verb == 'has':
+            return 'have'
+        if verb == 'was':
+            return 'were'
     
+        if verb[-3:] in ['ies']:
+            return verb[:-3] + 'y'
+        if verb[-2:] == 'es':
+            return verb[:-2]
+        if verb[-1] == 's':
+            return verb[:-1]
+        return verb
+    
+    def to_3th_person(self,verb):
+        if verb == 'are':
+            return 'is'
+        if verb == 'have':
+            return 'has'
+        if verb == 'were':
+            return 'was'
+    
+        if verb[-2:] in ['ss', 'ch', 'sh']:
+            return verb + 'es'
+        if verb[-1:] in ['x', 'o']:
+            return verb + 'es'
+        if verb[-1:] in ['y'] and verb[-2:-1] not in ['a','e','i','o','u']:
+            return verb[:-1] + 'ies'
+
+        return verb + 's'
+
+
+    def getOptionlist(self,checkWord,optionPass):   
+        checkWord = checkWord.lower()
+        outdic ={}
+        outdic = get_word_forms(checkWord)
+        #print(outdic)
+        
+        if optionPass in ['NNS','NN','NNP','NNPS']:
+            return list(outdic.get('n'))
+        elif optionPass in ['JJ','JJR','JJS']:
+            return list(outdic.get('a'))
+        elif optionPass in ['RB','RBR','RBS']:
+            return list(outdic.get('r'))
+        elif optionPass in ['VB','VBD','VBG','VBN','VBZ']:
+            return list(outdic.get('v'))
+
+    def getOthersolution(self):
+        mleft  = 1
+        mRight = 1
+        self.size = self.end-self.start+1
+
+        genSentence   = googSentList.GoogleSentList(True,True,True,False,self)
+        currentWord   = self.lstWords[self.start]
+
+        #generate the list 
+        optionList =[]
+        optionList = self.getOptionlist(currentWord,self.typeProb)
+        
+        self.lstChecksentoptions = genSentence.genSentlistOther(mleft,mRight,self.typeProb,currentWord,optionList)
+        #print(self.lstChecksentoptions)
+        
+
     def genChecklist(self):        
         
         self.problemCondition = True
@@ -108,25 +204,26 @@ class ProblemSolution:
 
 
         if self.size<=2:
-            #print("Try to remove Right wing")
-            genSentence              = googSentList.GoogleSentList(True,False,True,False,self)
-            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
-            self.getNgramcount()
-            if self.bestScore>0:
-                return 1
-            #print("Try to remove left wing")
-            genSentence              = googSentList.GoogleSentList(False,True,True,False,self)
-            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
-            self.getNgramcount()
-            if self.bestScore>0:
-                return 1
-            #print("Try to remove both wing")
-            genSentence              = googSentList.GoogleSentList(False,False,True,False,self)
-            self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
-            self.getNgramcount()
-            if self.bestScore>0:
-                return 1
-            
+            if self.errorType in ['ART','ArtChk','SPEL','OTHER']:
+                #print("Try to remove Right wing")
+                genSentence              = googSentList.GoogleSentList(True,False,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1
+                #print("Try to remove left wing")
+                genSentence              = googSentList.GoogleSentList(False,True,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1
+            if self.errorType in ['ART','ArtChk','SPEL']:
+                #print("Try to remove both wing")
+                genSentence              = googSentList.GoogleSentList(False,False,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1            
         return retVal
         
     def getNgramcount(self):

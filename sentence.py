@@ -1,6 +1,5 @@
 import problemlist as prbList
 import ErrorDef as errDef
-from treetagger import TreeTagger
 
 class Sentences:
     lstSent = None
@@ -29,9 +28,11 @@ class SentenceDetails:
     dep_tag     = None
     lstProb     = None
     lstSoln     = None
+    sentenceIndex = 0
+    lstOther    = None
     objLstProblems = None
     
-    def __init__(self):
+    def __init__(self,sentenceIndex, lstOther):
         self.inds         = []
         self.words        = []
         self.synt         = []
@@ -40,6 +41,8 @@ class SentenceDetails:
         self.dep_tag      = []
         self.lstProb      = []
         self.lstSoln      = []
+        self.sentenceIndex = sentenceIndex
+        self.lstOther     = lstOther
         self.objLstProblems = prbList.ProblemList(self.words)
     
     def addItems(self,indval,wordval,syntval,parseval,depnumval, depvalue):
@@ -69,7 +72,7 @@ class SentenceDetails:
     def listProblems(self):
         self.get_subj_and_verb()
         #checking the mismatch for other error
-        self.getOtherError()
+        #self.getOtherError()
         #problem listing
         self.lstProb = self.objLstProblems.getProbList()
 
@@ -165,39 +168,39 @@ class SentenceDetails:
                         self.objLstProblems.AddToProblemListTypewise("SVACOMP",retComp)
 
 
-    def getOtherError(self):
-        print("we are here pleas print")
-        tt = TreeTagger(language='english')
-        #getting the Stanford parse list
-        testSentence = " ".join(self.words)
-        print(testSentence)
-        # print(sentDet.words)
-        print(self.synt)
-        StanParserLst = []
-        StanParserLst = self.synt
-        # print(StanParserLst)
-        
-        outLst = tt.tag(testSentence)
-        tagLst  =[]
-        tagChangeDic ={'NP':'NNP','NPS':'NNPS','PP':'PRP','SENT':'.','(':'-LRB-', ')':'-RRB-'}
-
-        for word,tag,form in outLst:
-            if tag in tagChangeDic.keys():
-                tagLst.append(tagChangeDic.get(tag))
-            else:
-                tagLst.append(tag)
-        if len(self.synt)==len(tagLst):
-            SPlst = []
-            TTlst = []
-            i = 0
-            while(i < len(self.synt)):
-                if self.synt[i] != tagLst[i]:
-                    #create object for the error def
-                    objOthererr = errDef.ErrorDef("OTHER")
-                    retVal = objOthererr.checkOther(i,self.synt[i],self)
-                    if retVal != 0:
-                        self.objLstProblems.AddToProblemListTypewise("OTHER",retVal)
-                i += 1
-
-
-                
+#    def getOtherError(self):
+#        print("we are here pleas print")
+#        tt = TreeTagger(language='english')
+#        #getting the Stanford parse list
+#        testSentence = " ".join(self.words)
+#        print(testSentence)
+#        # print(sentDet.words)
+#        print(self.synt)
+#        StanParserLst = []
+#        StanParserLst = self.synt
+#        # print(StanParserLst)
+#        
+#        outLst = tt.tag(testSentence)
+#        tagLst  =[]
+#        tagChangeDic ={'NP':'NNP','NPS':'NNPS','PP':'PRP','SENT':'.','(':'-LRB-', ')':'-RRB-'}
+#
+#        for word,tag,form in outLst:
+#            if tag in tagChangeDic.keys():
+#                tagLst.append(tagChangeDic.get(tag))
+#            else:
+#                tagLst.append(tag)
+#        if len(self.synt)==len(tagLst):
+#            SPlst = []
+#            TTlst = []
+#            i = 0
+#            while(i < len(self.synt)):
+#                if self.synt[i] != tagLst[i]:
+#                    #create object for the error def
+#                    objOthererr = errDef.ErrorDef("OTHER")
+#                    retVal = objOthererr.checkOther(i,self.synt[i],self)
+#                    if retVal != 0:
+#                        self.objLstProblems.AddToProblemListTypewise("OTHER",retVal)
+#                i += 1
+#
+#
+#                
