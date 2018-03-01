@@ -126,7 +126,7 @@ class ErrorDef:
             return 0
         else:
             print("SVA Plural problem found: ", verb)
-            return [verbind,verbind,syntval,self.ErrorType]
+            return [verbind,verbind,"TO_PLURAL",self.ErrorType]
         
     def checkSpel(self, indval,word,sentDet):
         
