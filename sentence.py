@@ -98,7 +98,7 @@ class SentenceDetails:
         
     def get_subj_and_verb(self):
         #add rules for conjunctions
-        #verbs --> how does it work?
+        #verbs --> how does it work? #a lot -> look at how to detect this
         for index in range(len(self.inds)):
             subject_ind = -2
             subject_ref_ind = -3
@@ -134,10 +134,19 @@ class SentenceDetails:
                         #    other_verbs.append[verb]
                 if verb_ind == -4:
                     if auxpass_ind == -5:
-                        verb_ind = subject_ref_ind
+                        if self.dep_tag[subject_ref_ind] not in ["xcomp"]:
+                            verb_ind = subject_ref_ind
                     else:
                         verb_ind = auxpass_ind
                         #other_verbs = []
+                #print(self.words[verb_ind])	
+                # if self.dep_tag[subject_ref_ind] not in ["xcomp"]:
+                    # verb_ind = subject_ref_ind
+                    # #print("not xcomp")
+                # else:
+                    # verb_ind = -4					
+                    # #print("xcomp")
+                #print(self.words[verb_ind])	
                 syntverb = self.synt [verb_ind]	
                 if and_subj and verb_ind != -4:
                     #give verb to function asking if it's plural
