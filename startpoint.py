@@ -12,8 +12,8 @@ lTest  = fileTest.split('\n\n')
 #manually adding some 23
 lTest.insert(23,"1	4	2	31	''	''	-	-	*))")
 
-#for i in range(0,len(lTest)):
-for i in range(12,13):
+for i in range(0,len(lTest)):
+#for i in range(12,13):
     
     lines = lTest[i].split('\n')
     sentDet = sent.SentenceDetails()    
