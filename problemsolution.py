@@ -15,6 +15,8 @@ class ProblemSolution:
     allowRight          = 0
     chkMarked           = False
     chkWord             = ""
+    currentWord         = ""
+    optionList          = []
     #solution is an array which has 3 para
     #para 1 : start of the word list
     #para 2 : Solution type INB / INA /   NA / REP are the solutions
@@ -40,8 +42,12 @@ class ProblemSolution:
             self.getNgramcount()
             self.scoreCheck()
 
-            
-        if self.errorType in ['ART','ArtChk','SPEL']:
+        if self.errorType == 'SPEL':
+            self.getSpelSolution()
+            self.getNgramcount()
+            self.scoreCheck()
+
+        if self.errorType in ['ART','ArtChk']:
             self.genChecklist()
             if self.problemCondition == True:
                 self.getNgramcount()
@@ -119,20 +125,40 @@ class ProblemSolution:
             return list(outdic.get('r'))
         elif optionPass in ['VB','VBD','VBG','VBN','VBZ']:
             return list(outdic.get('v'))
+        
+    def getSpelSolution(self):
+        mleft  = 1
+        mRight = 1
+        self.allowLeft  = mleft
+        self.allowRight = mRight
+
+        self.size = self.end-self.start+1
+
+        genSentence   = googSentList.GoogleSentList(True,True,True,False,self)
+        self.currentWord   = self.lstWords[self.start]
+
+        #generate the list 
+        self.optionList =self.typeProb
+        
+        self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
+        print(self.lstChecksentoptions)
 
     def getOthersolution(self):
         mleft  = 1
         mRight = 1
+        self.allowLeft  = mleft
+        self.allowRight = mRight
+        
         self.size = self.end-self.start+1
 
         genSentence   = googSentList.GoogleSentList(True,True,True,False,self)
-        currentWord   = self.lstWords[self.start]
+        self.currentWord   = self.lstWords[self.start]
 
         #generate the list 
-        optionList =[]
-        optionList = self.getOptionlist(currentWord,self.typeProb)
+        self.optionList =[]
+        self.optionList = self.getOptionlist(self.currentWord,self.typeProb)
         
-        self.lstChecksentoptions = genSentence.genSentlistOther(mleft,mRight,self.typeProb,currentWord,optionList)
+        self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
         #print(self.lstChecksentoptions)
         
 
@@ -204,7 +230,7 @@ class ProblemSolution:
 
 
         if self.size<=2:
-            if self.errorType in ['ART','ArtChk','SPEL','OTHER']:
+            if self.errorType in ['ART','ArtChk']:
                 #print("Try to remove Right wing")
                 genSentence              = googSentList.GoogleSentList(True,False,True,False,self)
                 self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
@@ -217,13 +243,35 @@ class ProblemSolution:
                 self.getNgramcount()
                 if self.bestScore>0:
                     return 1
-            if self.errorType in ['ART','ArtChk','SPEL']:
+            elif self.errorType in ['SPEL','OTHER']:
+                #print("Try to remove Right wing")
+                genSentence              = googSentList.GoogleSentList(True,False,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1
+                #print("Try to remove left wing")
+                genSentence              = googSentList.GoogleSentList(False,True,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1
+
+                
+            if self.errorType in ['ART','ArtChk']:
                 #print("Try to remove both wing")
                 genSentence              = googSentList.GoogleSentList(False,False,True,False,self)
                 self.lstChecksentoptions = genSentence.genSentlist(self.allowLeft,self.allowRight,self.typeProb)
                 self.getNgramcount()
                 if self.bestScore>0:
                     return 1            
+            elif self.errorType in ['SPEL']:
+                genSentence              = googSentList.GoogleSentList(False,False,True,False,self)
+                self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
+                self.getNgramcount()
+                if self.bestScore>0:
+                    return 1            
+
         return retVal
         
     def getNgramcount(self):
@@ -241,8 +289,8 @@ class ProblemSolution:
                 #giving a extra score for ArtChk Checked Word
                 if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
                     outVal +=20000
-                #print(sent,opt,optval,self.chkWord)
-                #print(outVal)
+                print(sent,opt,optval,self.chkWord)
+                print(outVal)
                 
                 if outVal>self.bestScore:
                     self.bestScore  = outVal

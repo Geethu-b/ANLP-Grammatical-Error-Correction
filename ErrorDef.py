@@ -133,7 +133,7 @@ class ErrorDef:
         word = word.lower()
         checkedWord =spelchek.correct(word) 
         # not spell checked words
-        if word in [',','.',"'",'?',"''"]:
+        if word in [',','.',"'",'?',"''",'-']:
             return 0
         
         if checkedWord == word:
@@ -141,7 +141,7 @@ class ErrorDef:
         else:
             suggList = spelchek.guesses(word)
             suggList.append(checkedWord)
-            return [indval,indval+1,suggList,self.ErrorType]
+            return [indval,indval,suggList,self.ErrorType]
 
     def checkOther(self,indval,syntval,sentDet):
         validtags = ['JJ','JJR','JJS','NNS','NN','NNP','NNPS','RB','RBR','RBS','VB','VBD','VBG','VBN','VBZ']

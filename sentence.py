@@ -20,16 +20,16 @@ class Sentences:
     
     
 class SentenceDetails:
-    inds        = None
-    words       = None
-    synt        = None
-    parse       = None
-    dep_ind     = None
-    dep_tag     = None
-    lstProb     = None
-    lstSoln     = None
-    sentenceIndex = 0
-    lstOther    = None
+    inds           = None
+    words          = None
+    synt           = None
+    parse          = None
+    dep_ind        = None
+    dep_tag        = None
+    lstProb        = None
+    lstSoln        = None
+    sentenceIndex  = 0
+    lstOther       = None
     objLstProblems = None
     
     def __init__(self,sentenceIndex, lstOther):
@@ -72,6 +72,9 @@ class SentenceDetails:
     def listProblems(self):
         self.get_subj_and_verb()
         #checking the mismatch for other error
+        for prob in self.lstOther[self.sentenceIndex]:
+            #print(prob)
+            self.objLstProblems.AddToProblemListTypewise("OTHER",prob)
         #self.getOtherError()
         #problem listing
         self.lstProb = self.objLstProblems.getProbList()
