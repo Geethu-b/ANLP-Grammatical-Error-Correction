@@ -1,5 +1,5 @@
 from word_forms.word_forms import get_word_forms
-
+#Changes POS tags to be compatible with word_forms
 outdic ={}
 outdic = get_word_forms("secret")
 print(outdic)
