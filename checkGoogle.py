@@ -1,11 +1,21 @@
 #!/usr/bin/env python
 
+
+#Class enabling access to the Google ngrams
+#Its method is:
+#    qryGoogle	gives the Google ngram count for the specified ngram
+
 from __future__ import print_function
 import phrasefinder as pf
 
+#Gives the Google ngram count for the specified ngram
+#input:
+#	qryStr	the specified ngram as string
+#output:
+#	retval	the Google ngram count for qryStr; 0 if none
+#	-		no return value if request was not successful
 def qryGoogle(qryStr):
     """Requests the PhraseFinder web service and prints out the result."""
-    #print(qryStr)
     # Set up your query.
     query = qryStr
 
@@ -32,4 +42,4 @@ def qryGoogle(qryStr):
         raise
     
     return retval
-    
+  
