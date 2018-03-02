@@ -68,5 +68,34 @@ class GoogleSentList:
             
         return (self.lstChecksentoptions)
     
+    def genSentlistOther(self,allowLeft,allowRight,typeProb,currentWord,checkList):
+
+        if self.reduceLstMid == True:
+            startMid = self.start+1
+            endMid   = self.end
+        else:
+            startMid = self.start
+            endMid   = self.end
+
+        if self.chkMark == True:
+            startMid = startMid+1
+            endMid   = self.end
+        
+        if self.allowLstBefore == True:
+            self.wordLstBefore   = self.lstWords[self.start-allowLeft:self.start]            
+        if self.allowLstAfter == True:
+            self.wordLstAfter   = self.lstWords[self.end+1:self.end+allowRight+1]
+        if self.allowLstMid == True:
+            self.wordLstmid = self.lstWords[startMid:endMid+1]
+            
+            
+        #basic case for not changing    
+        self.lstChecksentoptions.append([" ".join(self.wordLstBefore + [currentWord] + self.wordLstAfter),'NA',currentWord])
+        
+        for word in checkList:
+            self.lstChecksentoptions.append([" ".join(self.wordLstBefore + [word] + self.wordLstAfter),'REP',word])
+                        
+        return (self.lstChecksentoptions)
+
 
 

@@ -30,7 +30,7 @@ class ProblemSolution:
         self.typeProb            = typep
         self.problemCondition    = False
         self.errorType           = errorTypeval
-        if self.errorType in ['ArtChk']:
+        if self.errorType in ['ArtChk','SPEL']:
             self.chkMarked       = True
             self.chkWord         = lstWordval[self.start]
         self.lstWords            = lstWordval
@@ -136,12 +136,13 @@ class ProblemSolution:
 
         genSentence   = googSentList.GoogleSentList(True,True,True,False,self)
         self.currentWord   = self.lstWords[self.start]
+        self.chkWord       = self.currentWord
 
         #generate the list 
         self.optionList =self.typeProb
         
         self.lstChecksentoptions = genSentence.genSentlistOther(self.allowLeft,self.allowRight,self.typeProb,self.currentWord,self.optionList)
-        print(self.lstChecksentoptions)
+        #print(self.lstChecksentoptions)
 
     def getOthersolution(self):
         mleft  = 1
@@ -280,14 +281,14 @@ class ProblemSolution:
         self.bestOptval = ""
         # get the best value to determine the solution
         for sent,opt,optval in self.lstChecksentoptions:
-            #print(sent,opt,optval)
+            print(sent,opt,optval)
             try:
                 outVal = cg.qryGoogle(sent)
                 #setting threshold to 1000
                 if outVal < 500:
                     outVal =0
                 #giving a extra score for ArtChk Checked Word
-                if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk']:
+                if outVal !=0 and optval==self.chkWord and self.errorType in ['ArtChk','SPEL']:
                     outVal +=20000
                 print(sent,opt,optval,self.chkWord)
                 print(outVal)
