@@ -146,6 +146,7 @@ class sentenceLibrary:
                 self.sentDetailobj.objLstProblems.AddToProblemListTypewise("OTHER",prob)
     
     def get_subj_and_verb(self):
+        print("i am here")
         #add rules for conjunctions
         #verbs --> how does it work? #a lot -> look at how to detect this
         for index in range(len(self.inds)):
@@ -160,7 +161,7 @@ class sentenceLibrary:
                 subject_ind = int(self.inds[index])
                 subject_ref_ind = int(self.dep_ind[index])
                 #print (subject_ind)
-                if self.dep_tag[subject_ref_ind]=="rcmod":
+                if self.dep_tag[subject_ref_ind] in ["rcmod", "acl:relcl"]:
                     subject_ind = int(self.dep_ind[subject_ref_ind])
 				
                 for conj in range(len(self.inds)):
