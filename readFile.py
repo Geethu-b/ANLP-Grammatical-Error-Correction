@@ -57,11 +57,11 @@ def readRawFileSentdet(filename,pickleFileName):
 #function for generation of list of words
 sentLst        = sent.Sentences()
 #sentence details list
-#lstSentencedet = readRawFileSentdet("testdata1.con","sentDetlist")    
-lstSentencedet = readPickleFileSentdet("sentDetlist")   
+lstSentencedet = readRawFileSentdet("testdata1.con","sentDetlist")    
+#lstSentencedet = readPickleFileSentdet("sva")   
 
 #looping through the sentene details objects
-for Index in range(0,12):
+for Index in range(0,1312):
     sentDet = lstSentencedet[Index]
     #adding in the sentences                
     print(sentDet.words)
@@ -77,7 +77,9 @@ for Index in range(0,12):
     sentDet.solveProblem()
 
     sentDet.getSolutionInSentence()
+    sentDet.getSolutionInTag()
     print(sentDet.words)
+    print(sentDet.synt)
 
 #save the sentence details list
 save_obj(lstSentencedet,"sentDetlist")    

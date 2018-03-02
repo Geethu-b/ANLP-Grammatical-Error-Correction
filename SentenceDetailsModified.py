@@ -1,6 +1,14 @@
 import problemlist as prbList
 import ErrorDef as errDef
 
+import os
+import nltk
+
+from nltk.tag import StanfordPOSTagger
+os.environ['JAVAHOME'] = "C:/Program Files/Java/jre1.8.0_151/bin"
+
+
+
 class SentenceDetailsModified:
     inds           = None
     words          = None
@@ -54,6 +62,15 @@ class SentenceDetailsModified:
         #initiate
         self.lstSoln = self.objLstProblems.getSolutions()
         print(self.lstSoln)
+        
+    def getSolutionInTag(self):
+        english_postagger = StanfordPOSTagger("F:/Potsdam_courses/ANLP/project/grammar_error/stanford-postagger-2017-06-09/models/english-bidirectional-distsim.tagger","F:/Potsdam_courses/ANLP/project/grammar_error/stanford-postagger-2017-06-09/stanford-postagger.jar")
+        
+        #retag the sentence again
+        new_tag_values = english_postagger.tag(self.words)      
+        for index in range(len(self.inds)):
+            word,tag = new_tag_values[index]
+            self.synt[index] = tag
     
     def getSolutionInSentence(self):
         #sort the list of solutions
