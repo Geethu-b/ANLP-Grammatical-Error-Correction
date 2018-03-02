@@ -133,7 +133,7 @@ class ErrorDef:
         word = word.lower()
         checkedWord =spelchek.correct(word) 
         # not spell checked words
-        if word in [',','.',"'",'?',"''",'-']:
+        if word in [',','.',"'",'?',"''",'-',':','(',')',';']:
             return 0
         
         if checkedWord == word:
