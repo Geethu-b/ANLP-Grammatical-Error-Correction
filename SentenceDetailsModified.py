@@ -69,7 +69,6 @@ class SentenceDetailsModified:
 
     #Adds the details regarding the words of the sentence
     def addItems(self,indval,wordval,syntval,parseval,depnumval, depvalue):
-        #print(indval,syntval)
         self.inds.append(indval)
         self.words.append(wordval)
         self.synt.append(syntval)
@@ -88,7 +87,6 @@ class SentenceDetailsModified:
 	#Generates the solutions and add them to the list of solutions
     def solveProblem(self):
         self.lstSoln = self.objLstProblems.getSolutions()
-        #print(self.lstSoln)
         
 	#Retags the sentence with the StanfordPOSTagger and saves the new tags in self.synt
     def getSolutionInTag(self):
@@ -251,7 +249,6 @@ class sentenceLibrary:
                 syntverb = self.synt [verb_ind]	
                 if and_subj and verb_ind != -4:
                     #give verb to function asking if it's plural
-                    print(self.words[verb_ind])
                     rComp = errDef.ErrorDef("SVACOMPplural")
                     retComp = rComp.checkSVACOMPplural(self.words[verb_ind],verb_ind,syntverb,self)
                     if retComp != 0:
@@ -259,7 +256,6 @@ class sentenceLibrary:
                 elif subject_ind != -2 and verb_ind != -4:
                     rComp = errDef.ErrorDef("SVACOMP")
                     retComp = rComp.checkSVACOMP(self.words[subject_ind],subject_ind,self.words[verb_ind],verb_ind,syntverb,self)
-                    print(retComp)
                     if retComp != 0:
                         self.sentDetailobj.objLstProblems.AddToProblemListTypewise("SVACOMP",retComp)
 
