@@ -7,7 +7,6 @@ import pickle
 #	obj		the given object
 #	name	a string containing the name the object is saved under
 def save_obj(obj, name ):
-    #with open('obj/'+ name + '.pkl', 'wb') as f:
         fh = open(name+'.pkl',"wb")
         pickle.dump(obj, fh, pickle.HIGHEST_PROTOCOL)
 
@@ -24,7 +23,7 @@ def load_obj(name ):
 #input:
 #	name			the name of the .pkl file
 #output:
-#	lstSentencedet	the list of Sentence Details
+#	lstSentencedet	the list of Sentence Details    
 def readPickleFileSentdet(pickleFileName):    
     #create a list of object of Sentence details
     lstSentencedet = load_obj(pickleFileName)
@@ -41,7 +40,6 @@ def readRawFileSentdet(filename,pickleFileName):
     fileTest  = open(filename,"r").read()
     #listing the values according to the sentences
     lTest  = fileTest.split('\n\n')
-    #manually adding some 23
     lTest.insert(23,"1	4	2	0	''	''	-	-	*))")
     
     #read the other type error problem list
@@ -50,7 +48,6 @@ def readRawFileSentdet(filename,pickleFileName):
     #create a list of object of Sentence details
     lstSentencedet = []
     
-    #for i in range(0,len(lTest)):
     for i in range(0,1312):    
         lines = lTest[i].split('\n')
         sentDet = sentModi.SentenceDetailsModified(i,lstOther)    
@@ -63,7 +60,6 @@ def readRawFileSentdet(filename,pickleFileName):
             #seperate by tab        
             if len(lines[j])>0:
                 elements = lines[j].split('\t')
-                #print(elements[3],elements[4],elements[5],elements[8])
                 sentDet.addItems(elements[3],elements[4],elements[5],elements[8],elements[6],elements[7])
            
         lstSentencedet.append(sentDet)
@@ -73,17 +69,15 @@ def readRawFileSentdet(filename,pickleFileName):
     return lstSentencedet
 
 
-#function for generation of list of words
-sentLst        = sent.Sentences()
-#sentence details list
-lstSentencedet = readRawFileSentdet("testdata1.con","sentDetlist")    
-#lstSentencedet = readPickleFileSentdet("sva")   
 
-#looping through the sentene details objects
+#Read the conll test data file and generate the pickle file containing corrections for spelling errors.
+lstSentencedet = readRawFileSentdet("testdata1.con","sentDetlist")    
+   
+
+#looping through the sentence details objects
 for Index in range(0,1312):
     sentDet = lstSentencedet[Index]
-    #adding in the sentences                
-    print(sentDet.words)
+              
     #reinitiate the problem list and other related 
     sentDet.initiateLists()
     #Operation mode Spelling
@@ -91,22 +85,90 @@ for Index in range(0,1312):
     sentLib.getProblem()
     
     sentDet.listProblems()
-    print(sentDet.lstProb)
     #getting the solution
     sentDet.solveProblem()
 
     sentDet.getSolutionInSentence()
     sentDet.getSolutionInTag()
-    print(sentDet.words)
-    print(sentDet.synt)
+    
+#save the sentence details list
+save_obj(lstSentencedet,"Spell")    
+
+
+# Read the Spelling error pickle file and generate the pickle file containing corrections for Other errors.
+lstSentencedet = readPickleFileSentdet("Spell")   
+
+#looping through the sentene details objects
+for Index in range(0,1312):
+    sentDet = lstSentencedet[Index]
+    #adding in the sentences                
+    
+    #reinitiate the problem list and other related 
+    sentDet.initiateLists()
+    #Operation mode Spelling
+    sentLib = sentModi.sentenceLibrary(sentDet,"OTHER")
+    sentLib.getProblem()    
+    sentDet.listProblems()
+    #getting the solution
+    sentDet.solveProblem()
+    sentDet.getSolutionInSentence()
+    sentDet.getSolutionInTag()
+
 
 #save the sentence details list
-save_obj(lstSentencedet,"sentDetlist")    
-#
-#    sentLst.addSentence(sentDet.getWords())
-#
-#sentLst.printSentences()
-##writing to a file 
-#fileW = open("m2file.txt","w")
-#fileW.write(sentLst.outStr)
-#fileW.close()
+save_obj(lstSentencedet,"Other")    
+
+# Read the Other error pickle file and generate the pickle file containing corrections for SVA errors.
+
+lstSentencedet = readPickleFileSentdet("Other")   
+
+#looping through the sentene details objects
+for Index in range(0,1312):
+    sentDet = lstSentencedet[Index]
+    #adding in the sentences                
+    
+    #reinitiate the problem list and other related 
+    sentDet.initiateLists()
+    #Operation mode Spelling
+    sentLib = sentModi.sentenceLibrary(sentDet,"SVA")
+    sentLib.getProblem()
+    
+    sentDet.listProblems()
+    
+    #getting the solution
+    sentDet.solveProblem()
+
+    sentDet.getSolutionInSentence()
+    sentDet.getSolutionInTag()
+
+
+#save the sentence details list
+save_obj(lstSentencedet,"sva")    
+
+
+# Read the SVA error pickle file and generate the pickle file containing corrections for Article or determiner errors.
+lstSentencedet = readPickleFileSentdet("sva")   
+
+#looping through the sentene details objects
+for Index in range(0,1312):
+    sentDet = lstSentencedet[Index]
+    #adding in the sentences                
+
+    #reinitiate the problem list and other related 
+    sentDet.initiateLists()
+    #Operation mode Spelling
+    sentLib = sentModi.sentenceLibrary(sentDet,"ART")
+    sentLib.getProblem()
+    
+    sentDet.listProblems()
+
+    #getting the solution
+    sentDet.solveProblem()
+
+    sentDet.getSolutionInSentence()
+    sentDet.getSolutionInTag()
+
+
+#save the sentence details list
+save_obj(lstSentencedet,"final")    
+
