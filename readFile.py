@@ -98,15 +98,15 @@ def runOperationWise(Operation,picklefilename,optionRetag=False):
 
 #Read the conll test data file and generate the pickle file containing corrections for spelling errors.
 lstSentencedet = readRawFileSentdet("testdata1.con","sentDetlist")    
-runOperationWise("SPEL","spel",True)
+runOperationWise("SPEL","spel")
 
 # Read the Spelling error pickle file and generate the pickle file containing corrections for Other errors.
 lstSentencedet = readPickleFileSentdet("spel") 
-runOperationWise("OTHER","other",True)
+runOperationWise("OTHER","other")
  
 # Read the Other error pickle file and generate the pickle file containing corrections for SVA errors.
 lstSentencedet = readPickleFileSentdet("other")   
-runOperationWise("SVA","sva",True)
+runOperationWise("SVA","sva")
 
 # Read the SVA error pickle file and generate the pickle file containing corrections for Article or determiner errors.
 lstSentencedet = readPickleFileSentdet("sva")   
