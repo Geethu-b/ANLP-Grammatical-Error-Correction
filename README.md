@@ -13,6 +13,8 @@ makeM2Sen.py takes the final pickle file[all.pkl] and generates M2file.txt. This
 The scorer files are in the folder M2scorer and can be initiated with the file m2score_report.py.
 The readme file in the examples folder has more details for processing using m2scorer.
 
+The pickle files are provided in the results folder and if needed, can be used to execute the individual modules. M2file is also provided which can be used to run the m2scorer.
+
 Links:
 Treetagger installation : http://www.cis.uni-muenchen.de/~schmid/tools/TreeTagger/
 Spelcheck		: https://github.com/theodox/spelchek
