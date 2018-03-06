@@ -1,0 +1,13 @@
+#M2 score 
+
+CORRECT EDITS  : 500
+PROPOSED EDITS : 1900
+GOLD EDITS     : 2365
+P = 0.2631578947368421
+R = 0.21141649048625794
+F_0.5 = 0.2508780732563974
+Precision   : 0.2632
+Recall      : 0.2114
+F_0.5       : 0.2509
+Summary Gold: {'ArtOrDet': 756, 'Nn': 423, 'Vt': 276, 'Trans': 171, 'Mec': 708, 'Prep': 589, 'Rloc-': 289, 'Wci': 810, 'Wform': 175, 'Vform': 219, 'Vm': 85, 'WOadv': 38, 'Others': 93, 'Ssub': 77, 'V0': 68, 'WOinc': 76, 'Npos': 34, 'Spar': 26, 'Pref': 245, 'SVA': 250, 'Srun': 27, 'Pform': 65, 'Um': 54, 'Sfrag': 14, 'Smod': 5, 'Wtone': 24, 'Wa': 1}
+Summary Cor.: {'Mec': 132, 'ArtOrDet': 294, 'Vform': 11, 'Rloc-': 57, 'SVA': 74, 'Wform': 17, 'Wci': 12, 'Nn': 18, 'Wtone': 8, 'Npos': 3, 'Um': 7, 'Ssub': 2, 'Vt': 6, 'Spar': 1, 'Trans': 4, 'Pform': 1, 'Prep': 36, 'Pref': 11, 'Others': 2, 'Vm': 1, 'V0': 1}
